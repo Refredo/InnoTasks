@@ -1,15 +1,21 @@
 import pandas as pd
 import psycopg2 as ps
 from sqlalchemy import create_engine
+
+from dotenv import load_dotenv 
 import argparse
+import os
+
 import json
 from typing import Dict
 
+load_dotenv()
+
 connection = ps.connect(
         host = 'localhost',
-        database = 'test',
-        user = 'postgres',
-        password = 'postgres',
+        database = os.getenv('POSTGRES_DB'),
+        user = os.getenv('POSTGRES_USER'),
+        password = os.getenv('POSTGRES_PASSWORD'),
         port = 5432
     )
 
@@ -81,10 +87,10 @@ def load_data(df_students, df_rooms) -> None:
     students_table = 'students'
     rooms_table = 'rooms'
     
-    host = 'localhost'
-    database = 'test'
-    user = 'postgres'
-    password = 'postgres'
+    host = 'localhost',
+    database = os.getenv('POSTGRES_DB'),
+    user = os.getenv('POSTGRES_USER'),
+    password = os.getenv('POSTGRES_PASSWORD'),
     port = 5432
 
     engine = create_engine(f'postgresql://{user}:{password}@{host}:{port}/{database}')
