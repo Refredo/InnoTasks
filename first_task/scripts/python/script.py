@@ -36,7 +36,21 @@ def create_tables() -> None:
         logger.info('Tables were created successfully')
 
     except Exception as e:
-        logger.error(f"can't execute create tables by exception: {e}")
+        logger.error(f"can't create tables by exception: {e}")
+    
+    finally:
+        cursor.close()
+
+def create_indexes() -> None:
+    try:
+        cursor = connection.cursor()
+        cursor.execute(open('../sql/indexes.sql', 'r').read())
+        connection.commit()
+
+        logger.info('Indexes were created successfully')
+
+    except Exception as e:
+        logger.error(f"can't create indexes by exception: {e}")
     
     finally:
         cursor.close()
@@ -155,6 +169,7 @@ def main():
     students, rooms = extract_data(args.students, args.rooms)
     df_students, df_rooms = transform_data(students, rooms)
     load_data(df_students, df_rooms)
+    create_indexes()
     execute_queries(args.format)
     connection.close()
 
