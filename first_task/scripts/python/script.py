@@ -19,15 +19,7 @@ logger = logging.getLogger("data loading")
 
 load_dotenv()
 
-connection = ps.connect(
-        host = 'localhost',
-        database = os.getenv('POSTGRES_DB'),
-        user = os.getenv('POSTGRES_USER'),
-        password = os.getenv('POSTGRES_PASSWORD'),
-        port = 5432
-    )
-
-def create_tables() -> None:
+def create_tables(connection) -> None:
     try:
         cursor = connection.cursor()
         cursor.execute(open('../sql/schema.sql', 'r').read())
@@ -41,7 +33,7 @@ def create_tables() -> None:
     finally:
         cursor.close()
 
-def create_indexes() -> None:
+def create_indexes(connection) -> None:
     try:
         cursor = connection.cursor()
         cursor.execute(open('../sql/indexes.sql', 'r').read())
@@ -55,7 +47,7 @@ def create_indexes() -> None:
     finally:
         cursor.close()
 
-def execute_queries(save_format='json') -> None:
+def execute_queries(connection, save_format='json') -> None:
     cursor = connection.cursor()
     
     try:
@@ -164,13 +156,21 @@ def main():
     
     args = parser.parse_args()
 
-    create_tables()
+    connection = ps.connect(
+        host = 'localhost',
+        database = os.getenv('POSTGRES_DB'),
+        user = os.getenv('POSTGRES_USER'),
+        password = os.getenv('POSTGRES_PASSWORD'),
+        port = 5432
+    )
+
+    create_tables(connection)
     
     students, rooms = extract_data(args.students, args.rooms)
     df_students, df_rooms = transform_data(students, rooms)
     load_data(df_students, df_rooms)
-    create_indexes()
-    execute_queries(args.format)
+    create_indexes(connection)
+    execute_queries(connection, args.format)
     connection.close()
 
 
