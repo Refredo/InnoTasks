@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  jupyter:
+    image: "jupyter/all-spark-notebook"
+    volumes:
+      - pyspark-data:/home/jovyan
+      - ./PySpark_Basics.ipynb:/home/jovyan/PySpark_Basics.ipynb 
+    ports:
+      - "8888:8888"
+
+volumes:
+  pyspark-data:
